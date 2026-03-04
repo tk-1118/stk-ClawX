@@ -58,7 +58,7 @@ export interface AppSettings {
  */
 const defaults: AppSettings = {
   // General
-  theme: 'system',
+  theme: 'light',
   language: 'zh',
   startMinimized: false,
   launchAtStartup: false,
@@ -99,6 +99,13 @@ async function getSettingsStore() {
     settingsStoreInstance = new Store<AppSettings>({
       name: 'settings',
       defaults,
+      migrations: {
+        '0.0.1': (store: { get: (k: string) => unknown; set: (k: string, v: unknown) => void }) => {
+          if (store.get('theme') === 'system') {
+            store.set('theme', 'light');
+          }
+        },
+      },
     });
   }
   return settingsStoreInstance;

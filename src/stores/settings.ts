@@ -62,7 +62,7 @@ interface SettingsState {
 }
 
 const defaultSettings = {
-  theme: 'system' as Theme,
+  theme: 'light' as Theme,
   language: 'zh',
   startMinimized: false,
   launchAtStartup: false,
@@ -100,7 +100,7 @@ export const useSettingsStore = create<SettingsState>()(
         }
       },
 
-      setTheme: (theme) => set({ theme }),
+      setTheme: (theme) => { set({ theme }); void window.electron.ipcRenderer.invoke('settings:set', 'theme', theme).catch(() => {}); },
       setLanguage: (language) => { i18n.changeLanguage(language); set({ language }); void window.electron.ipcRenderer.invoke('settings:set', 'language', language).catch(() => {}); },
       setStartMinimized: (startMinimized) => set({ startMinimized }),
       setLaunchAtStartup: (launchAtStartup) => set({ launchAtStartup }),

@@ -9,8 +9,8 @@ describe('Settings Store', () => {
   beforeEach(() => {
     // Reset store to default state
     useSettingsStore.setState({
-      theme: 'system',
-      language: 'en',
+      theme: 'light',
+      language: 'zh',
       sidebarCollapsed: false,
       devModeUnlocked: false,
       gatewayAutoStart: true,

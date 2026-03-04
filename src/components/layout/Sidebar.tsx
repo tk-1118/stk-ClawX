@@ -111,7 +111,7 @@ export function Sidebar() {
   const navItems = [
     { to: '/cron', icon: <Clock className="h-5 w-5" />, label: t('sidebar.cronTasks') },
     { to: '/skills', icon: <Puzzle className="h-5 w-5" />, label: t('sidebar.skills') },
-    { to: '/channels', icon: <Radio className="h-5 w-5" />, label: t('sidebar.channels') },
+    // { to: '/channels', icon: <Radio className="h-5 w-5" />, label: t('sidebar.channels') },
     { to: '/dashboard', icon: <Home className="h-5 w-5" />, label: t('sidebar.dashboard') },
     { to: '/settings', icon: <Settings className="h-5 w-5" />, label: t('sidebar.settings') },
   ];

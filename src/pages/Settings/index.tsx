@@ -269,7 +269,7 @@ export function Settings() {
       </div>
 
       {/* Appearance */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>{t('appearance.title')}</CardTitle>
           <CardDescription>{t('appearance.description')}</CardDescription>
@@ -320,7 +320,7 @@ export function Settings() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* AI Providers */}
       <Card>
@@ -511,7 +511,7 @@ export function Settings() {
       </Card>
 
       {/* Updates */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Download className="h-5 w-5" />
@@ -553,7 +553,7 @@ export function Settings() {
             />
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Advanced */}
       <Card>
@@ -669,7 +669,7 @@ export function Settings() {
       )}
 
       {/* About */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>{t('about.title')}</CardTitle>
         </CardHeader>
@@ -696,7 +696,7 @@ export function Settings() {
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }
