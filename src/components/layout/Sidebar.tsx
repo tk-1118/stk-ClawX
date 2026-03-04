@@ -109,10 +109,10 @@ export function Sidebar() {
   const [sessionToDelete, setSessionToDelete] = useState<{ key: string; label: string } | null>(null);
 
   const navItems = [
+    { to: '/dashboard', icon: <Home className="h-5 w-5" />, label: t('sidebar.dashboard') },
     { to: '/cron', icon: <Clock className="h-5 w-5" />, label: t('sidebar.cronTasks') },
     { to: '/skills', icon: <Puzzle className="h-5 w-5" />, label: t('sidebar.skills') },
     // { to: '/channels', icon: <Radio className="h-5 w-5" />, label: t('sidebar.channels') },
-    { to: '/dashboard', icon: <Home className="h-5 w-5" />, label: t('sidebar.dashboard') },
     { to: '/settings', icon: <Settings className="h-5 w-5" />, label: t('sidebar.settings') },
   ];
 
@@ -126,6 +126,17 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-hidden flex flex-col p-2 gap-1">
         {/* Chat nav item: acts as "New Chat" button, never highlighted as active */}
+
+        {navItems.map((item) => (
+          <NavItem
+            key={item.to}
+            {...item}
+            collapsed={sidebarCollapsed}
+          />
+        ))}
+
+        <div className="border-t border-gray-200"></div>
+        
         <button
           onClick={() => {
             const { messages } = useChatStore.getState();
@@ -141,14 +152,6 @@ export function Sidebar() {
           <MessageSquare className="h-5 w-5 shrink-0" />
           {!sidebarCollapsed && <span className="flex-1 text-left">{t('sidebar.newChat')}</span>}
         </button>
-
-        {navItems.map((item) => (
-          <NavItem
-            key={item.to}
-            {...item}
-            collapsed={sidebarCollapsed}
-          />
-        ))}
 
         {/* Session list — below Settings, only when expanded */}
         {!sidebarCollapsed && sessions.length > 0 && (
