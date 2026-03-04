@@ -89,7 +89,7 @@ const DEFAULT_RECONNECT_CONFIG: ReconnectConfig = {
 /**
  * Ensure the gateway fetch-preload script exists in userData and return
  * its absolute path.  The script patches globalThis.fetch to inject
- * ClawX app-attribution headers (HTTP-Referer, X-Title) for OpenRouter
+ * HNClaw app-attribution headers (HTTP-Referer, X-Title) for OpenRouter
  * API requests, overriding the OpenClaw runner's hardcoded defaults.
  *
  * Inlined here so it works in dev, packaged, and asar modes without
@@ -123,7 +123,7 @@ const GATEWAY_FETCH_PRELOAD_SOURCE = `'use strict';
       delete flat['x-title'];
       delete flat['X-Title'];
       flat['HTTP-Referer'] = 'https://claw-x.com';
-      flat['X-Title'] = 'ClawX';
+      flat['X-Title'] = 'HNClaw';
       init.headers = flat;
     }
     return _f.call(globalThis, input, init);
@@ -1148,7 +1148,7 @@ export class GatewayManager extends EventEmitter {
         OPENCLAW_NO_RESPAWN: '1',
       };
 
-      // Inject fetch preload so OpenRouter requests carry ClawX headers.
+      // Inject fetch preload so OpenRouter requests carry HNClaw headers.
       // The preload patches globalThis.fetch before any module loads.
       try {
         const preloadPath = ensureGatewayFetchPreload();
@@ -1374,7 +1374,7 @@ export class GatewayManager extends EventEmitter {
             maxProtocol: 3,
             client: {
               id: clientId,
-              displayName: 'ClawX',
+              displayName: 'HNClaw',
               version: '0.1.0',
               platform: process.platform,
               mode: clientMode,

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Post-installation script for ClawX on Linux
+# Post-installation script for HNClaw on Linux
 
 set -e
 
@@ -14,16 +14,16 @@ if command -v gtk-update-icon-cache &> /dev/null; then
     gtk-update-icon-cache -q /usr/share/icons/hicolor || true
 fi
 
-# Create symbolic link for ClawX app binary
-if [ -x /opt/ClawX/clawx ]; then
-    ln -sf /opt/ClawX/clawx /usr/local/bin/clawx 2>/dev/null || true
+# Create symbolic link for HNClaw app binary
+if [ -x /opt/HNClaw/HNClaw ]; then
+    ln -sf /opt/HNClaw/HNClaw /usr/local/bin/HNClaw 2>/dev/null || true
 fi
 
 # Create symbolic link for openclaw CLI
-OPENCLAW_WRAPPER="/opt/ClawX/resources/cli/openclaw"
+OPENCLAW_WRAPPER="/opt/HNClaw/resources/cli/openclaw"
 if [ -f "$OPENCLAW_WRAPPER" ]; then
     chmod +x "$OPENCLAW_WRAPPER" 2>/dev/null || true
     ln -sf "$OPENCLAW_WRAPPER" /usr/local/bin/openclaw 2>/dev/null || true
 fi
 
-echo "ClawX has been installed successfully."
+echo "HNClaw has been installed successfully."

@@ -14,7 +14,7 @@ import { logger } from '../utils/logger';
 import { warmupNetworkOptimization } from '../utils/uv-env';
 
 import { ClawHubService } from '../gateway/clawhub';
-import { ensureClawXContext, repairClawXOnlyBootstrapFiles } from '../utils/openclaw-workspace';
+import { ensureHNClawContext, repairHNClawOnlyBootstrapFiles } from '../utils/openclaw-workspace';
 import { autoInstallCliIfNeeded, generateCompletionCache, installCompletionToProfile } from '../utils/openclaw-cli';
 import { isQuitting, setQuitting } from './app-state';
 import { applyProxySettings } from './proxy';
@@ -131,7 +131,7 @@ function createWindow(): BrowserWindow {
 async function initialize(): Promise<void> {
   // Initialize logger first
   logger.init();
-  logger.info('=== ClawX Application Starting ===');
+  logger.info('=== HNClaw Application Starting ===');
   logger.debug(
     `Runtime: platform=${process.platform}/${process.arch}, electron=${process.versions.electron}, node=${process.versions.node}, packaged=${app.isPackaged}`
   );
@@ -195,10 +195,10 @@ async function initialize(): Promise<void> {
     mainWindow = null;
   });
 
-  // Repair any bootstrap files that only contain ClawX markers (no OpenClaw
-  // template content). This fixes a race condition where ensureClawXContext()
+  // Repair any bootstrap files that only contain HNClaw markers (no OpenClaw
+  // template content). This fixes a race condition where ensureHNClawContext()
   // previously created the file before the gateway could seed the full template.
-  void repairClawXOnlyBootstrapFiles().catch((error) => {
+  void repairHNClawOnlyBootstrapFiles().catch((error) => {
     logger.warn('Failed to repair bootstrap files:', error);
   });
 
@@ -223,11 +223,11 @@ async function initialize(): Promise<void> {
     logger.info('Gateway auto-start disabled in settings');
   }
 
-  // Merge ClawX context snippets into the workspace bootstrap files.
+  // Merge HNClaw context snippets into the workspace bootstrap files.
   // The gateway seeds workspace files asynchronously after its HTTP server
-  // is ready, so ensureClawXContext will retry until the target files appear.
-  void ensureClawXContext().catch((error) => {
-    logger.warn('Failed to merge ClawX context into workspace:', error);
+  // is ready, so ensureHNClawContext will retry until the target files appear.
+  void ensureHNClawContext().catch((error) => {
+    logger.warn('Failed to merge HNClaw context into workspace:', error);
   });
 
   // Auto-install openclaw CLI and shell completions (non-blocking).
@@ -240,12 +240,12 @@ async function initialize(): Promise<void> {
     logger.warn('CLI auto-install failed:', error);
   });
 
-  // Re-apply ClawX context after every gateway restart because the gateway
-  // may re-seed workspace files with clean templates (losing ClawX markers).
+  // Re-apply HNClaw context after every gateway restart because the gateway
+  // may re-seed workspace files with clean templates (losing HNClaw markers).
   gatewayManager.on('status', (status: { state: string }) => {
     if (status.state === 'running') {
-      void ensureClawXContext().catch((error) => {
-        logger.warn('Failed to re-merge ClawX context after gateway reconnect:', error);
+      void ensureHNClawContext().catch((error) => {
+        logger.warn('Failed to re-merge HNClaw context after gateway reconnect:', error);
       });
     }
   });

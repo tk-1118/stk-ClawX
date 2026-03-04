@@ -1,4 +1,4 @@
-; ClawX Custom NSIS Installer/Uninstaller Script
+; HNClaw Custom NSIS Installer/Uninstaller Script
 ;
 ; Install: enables long paths, adds resources\cli to user PATH for openclaw CLI.
 ; Uninstall: removes the PATH entry and optionally deletes user data.
@@ -152,14 +152,14 @@ FunctionEnd
 
   ; Ask user if they want to completely remove all user data
   MessageBox MB_YESNO|MB_ICONQUESTION \
-    "Do you want to completely remove all ClawX user data?$\r$\n$\r$\nThis will delete:$\r$\n  • .openclaw folder (configuration & skills)$\r$\n  • AppData\Local\clawx (local app data)$\r$\n  • AppData\Roaming\clawx (roaming app data)$\r$\n$\r$\nSelect 'No' to keep your data for future reinstallation." \
+    "Do you want to completely remove all HNClaw user data?$\r$\n$\r$\nThis will delete:$\r$\n  • .openclaw folder (configuration & skills)$\r$\n  • AppData\Local\HNClaw (local app data)$\r$\n  • AppData\Roaming\HNClaw (roaming app data)$\r$\n$\r$\nSelect 'No' to keep your data for future reinstallation." \
     /SD IDNO IDYES _cu_removeData IDNO _cu_skipRemove
 
   _cu_removeData:
     ; --- Always remove current user's data first ---
     RMDir /r "$PROFILE\.openclaw"
-    RMDir /r "$LOCALAPPDATA\clawx"
-    RMDir /r "$APPDATA\clawx"
+    RMDir /r "$LOCALAPPDATA\HNClaw"
+    RMDir /r "$APPDATA\HNClaw"
 
     ; --- For per-machine (all users) installs, enumerate all user profiles ---
     StrCpy $R0 0
@@ -175,8 +175,8 @@ FunctionEnd
     StrCmp $R2 $PROFILE _cu_enumNext
 
     RMDir /r "$R2\.openclaw"
-    RMDir /r "$R2\AppData\Local\clawx"
-    RMDir /r "$R2\AppData\Roaming\clawx"
+    RMDir /r "$R2\AppData\Local\HNClaw"
+    RMDir /r "$R2\AppData\Roaming\HNClaw"
 
   _cu_enumNext:
     IntOp $R0 $R0 + 1
