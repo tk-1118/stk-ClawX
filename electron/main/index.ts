@@ -20,6 +20,19 @@ import { isQuitting, setQuitting } from './app-state';
 import { applyProxySettings } from './proxy';
 import { getSetting } from '../utils/store';
 import { ensureBuiltinSkillsInstalled } from '../utils/skill-config';
+import {
+  getAllProviders,
+  saveProvider,
+  storeApiKey,
+  setDefaultProvider,
+  type ProviderConfig,
+} from '../utils/secure-storage';
+import {
+  saveProviderKeyToOpenClaw,
+  syncProviderConfigToOpenClaw,
+  setOpenClawDefaultModelWithOverride,
+  updateAgentModelProvider,
+} from '../utils/openclaw-auth';
 
 // Disable GPU hardware acceleration globally for maximum stability across
 // all GPU configurations (no GPU, integrated, discrete).
@@ -208,6 +221,9 @@ async function initialize(): Promise<void> {
     logger.warn('Failed to install built-in skills:', error);
   });
 
+  // Pre-configure built-in provider so users can chat immediately on first launch
+  await ensureBuiltinProviderConfigured();
+
   // Start Gateway automatically (this seeds missing bootstrap files with full templates)
   const gatewayAutoStart = await getSetting('gatewayAutoStart');
   if (gatewayAutoStart) {
@@ -291,6 +307,68 @@ app.on('before-quit', () => {
     logger.warn('gatewayManager.stop() error during quit:', err);
   });
 });
+
+/**
+ * Ensure the built-in provider is configured on first launch.
+ * Only runs when no providers exist yet, so user-added providers are never overwritten.
+ */
+async function ensureBuiltinProviderConfigured(): Promise<void> {
+  try {
+    const existing = await getAllProviders();
+    if (existing.length > 0) {
+      logger.info('Providers already configured, skipping built-in provider setup');
+      return;
+    }
+
+    const PROVIDER_ID = 'huaneng-builtin-00000000-0001';
+    const API_KEY = 'sk-wKr34ar2jlhS8nkex4EhR7GamH1GUSQb1487Fr3KeEVazilQ';
+    const BASE_URL = 'http://62.234.66.78:3000/v1';
+    const MODEL = 'huaneng-code';
+
+    const now = new Date().toISOString();
+    const config: ProviderConfig = {
+      id: PROVIDER_ID,
+      name: '华能代码助手',
+      type: 'custom',
+      baseUrl: BASE_URL,
+      model: MODEL,
+      enabled: true,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await saveProvider(config);
+    await storeApiKey(PROVIDER_ID, API_KEY);
+    await setDefaultProvider(PROVIDER_ID);
+
+    // Derive the OpenClaw provider key: "custom-{first8charsOfIdWithoutDashes}"
+    const ock = `custom-${PROVIDER_ID.replace(/-/g, '').slice(0, 8)}`;
+
+    // Sync key and config into OpenClaw runtime files
+    await saveProviderKeyToOpenClaw(ock, API_KEY);
+    await syncProviderConfigToOpenClaw(ock, MODEL, {
+      baseUrl: BASE_URL,
+      api: 'openai-completions',
+      apiKeyEnv: undefined,
+    });
+    await updateAgentModelProvider(ock, {
+      baseUrl: BASE_URL,
+      api: 'openai-completions',
+      models: [{ id: MODEL, name: MODEL }],
+      apiKey: API_KEY,
+    });
+    await setOpenClawDefaultModelWithOverride(
+      ock,
+      `${ock}/${MODEL}`,
+      { baseUrl: BASE_URL, api: 'openai-completions' },
+      []
+    );
+
+    logger.info(`Built-in provider "${config.name}" configured (key: ${ock})`);
+  } catch (error) {
+    logger.warn('Failed to configure built-in provider:', error);
+  }
+}
 
 // Export for testing
 export { mainWindow, gatewayManager };

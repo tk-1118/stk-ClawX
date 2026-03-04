@@ -2,7 +2,7 @@
  * Root Application Component
  * Handles routing and global providers
  */
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Component, useEffect } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 import { Toaster } from 'sonner';
@@ -86,11 +86,9 @@ class ErrorBoundary extends Component<
 
 function App() {
   const navigate = useNavigate();
-  const location = useLocation();
   const initSettings = useSettingsStore((state) => state.init);
   const theme = useSettingsStore((state) => state.theme);
   const language = useSettingsStore((state) => state.language);
-  const setupComplete = useSettingsStore((state) => state.setupComplete);
   const initGateway = useGatewayStore((state) => state.init);
 
   useEffect(() => {
@@ -109,12 +107,7 @@ function App() {
     initGateway();
   }, [initGateway]);
 
-  // Redirect to setup wizard if not complete
-  useEffect(() => {
-    if (!setupComplete && !location.pathname.startsWith('/setup')) {
-      navigate('/setup');
-    }
-  }, [setupComplete, location.pathname, navigate]);
+  // Setup wizard redirect disabled — built-in provider is pre-configured
 
   // Listen for navigation events from main process
   useEffect(() => {
