@@ -27,6 +27,8 @@ import {
   Key,
   ChevronDown,
   FolderOpen,
+  UploadCloud,
+  FolderInput,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -638,12 +640,102 @@ export function Skills() {
   }, [t]);
 
   const [skillsDirPath, setSkillsDirPath] = useState('~/.openclaw/skills');
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const dragCounterRef = useRef(0);
 
   useEffect(() => {
     window.electron.ipcRenderer.invoke('openclaw:getSkillsDir')
       .then((dir) => setSkillsDirPath(dir as string))
       .catch(console.error);
   }, []);
+
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current++;
+    if (e.dataTransfer.types.includes('Files')) {
+      setIsDragOver(true);
+    }
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current--;
+    if (dragCounterRef.current <= 0) {
+      dragCounterRef.current = 0;
+      setIsDragOver(false);
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.types.includes('Files')) {
+      e.dataTransfer.dropEffect = 'copy';
+    }
+  }, []);
+
+  // Shared logic: import a list of zip file paths
+  const handleImportFiles = useCallback(async (filePaths: string[]) => {
+    setIsImporting(true);
+    let successCount = 0;
+
+    for (const filePath of filePaths) {
+      try {
+        const result = await window.electron.ipcRenderer.invoke('skill:importZip', filePath) as { success: boolean; slugs?: string[]; error?: string };
+        if (result.success) {
+          successCount++;
+        } else {
+          toast.error(`${t('toast.importFailed')}: ${result.error}`);
+        }
+      } catch (err) {
+        toast.error(`${t('toast.importFailed')}: ${String(err)}`);
+      }
+    }
+
+    setIsImporting(false);
+
+    if (successCount > 0) {
+      toast.success(t('toast.importSuccess'));
+      await fetchSkills();
+    }
+  }, [t, fetchSkills]);
+
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current = 0;
+    setIsDragOver(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    const zipFiles = files.filter(f => f.name.toLowerCase().endsWith('.zip'));
+
+    if (zipFiles.length === 0) {
+      toast.error(t('toast.importNotZip'));
+      return;
+    }
+
+    const filePaths = zipFiles.map(f => window.electron.getPathForFile(f));
+    await handleImportFiles(filePaths);
+  }, [t, handleImportFiles]);
+
+  // Open OS file picker to select zip(s)
+  const handlePickFiles = useCallback(async () => {
+    try {
+      const result = await window.electron.ipcRenderer.invoke('dialog:open', {
+        title: t('importDialog.title'),
+        filters: [{ name: t('importDialog.filterName'), extensions: ['zip'] }],
+        properties: ['openFile', 'multiSelections'],
+      }) as { canceled: boolean; filePaths: string[] };
+
+      if (result.canceled || result.filePaths.length === 0) return;
+      await handleImportFiles(result.filePaths);
+    } catch (err) {
+      toast.error(`${t('toast.importFailed')}: ${String(err)}`);
+    }
+  }, [t, handleImportFiles]);
 
   // Handle marketplace search
   const handleMarketplaceSearch = useCallback((e: React.FormEvent) => {
@@ -713,7 +805,57 @@ export function Skills() {
   }
 
   return (
-    <div className="space-y-6">
+    <div
+      className="space-y-6 relative"
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      {/* Drag-and-drop overlay */}
+      <AnimatePresence>
+        {(isDragOver || isImporting) && (
+          <motion.div
+            key="drop-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+          >
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="relative z-10 flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-primary bg-background/90 px-16 py-12 shadow-xl"
+            >
+              {isImporting ? (
+                <>
+                  <div className="relative">
+                    <div className="h-16 w-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                    <Package className="absolute inset-0 m-auto h-7 w-7 text-primary" />
+                  </div>
+                  <p className="text-lg font-semibold text-primary">{t('dropZone.importing')}</p>
+                </>
+              ) : (
+                <>
+                  <motion.div
+                    animate={{ y: [0, -6, 0] }}
+                    transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <UploadCloud className="h-16 w-16 text-primary" />
+                  </motion.div>
+                  <p className="text-lg font-semibold text-primary">{t('dropZone.title')}</p>
+                  <p className="text-sm text-muted-foreground">{t('dropZone.subtitle')}</p>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -726,6 +868,10 @@ export function Skills() {
           <Button variant="outline" onClick={fetchSkills} disabled={!isGatewayRunning}>
             <RefreshCw className="h-4 w-4 mr-2" />
             {t('refresh')}
+          </Button>
+          <Button variant="outline" onClick={handlePickFiles} disabled={isImporting}>
+            <FolderInput className="h-4 w-4 mr-2" />
+            {t('importZip')}
           </Button>
           {hasInstalledSkills && (
             <Button variant="outline" onClick={handleOpenSkillsFolder}>

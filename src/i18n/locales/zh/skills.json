@@ -2,6 +2,7 @@
     "title": "技能",
     "subtitle": "浏览和管理 AI 能力",
     "refresh": "刷新",
+    "importZip": "导入技能包",
     "openFolder": "打开技能文件夹",
     "gatewayWarning": "网关未运行。没有活跃的网关，无法加载技能。",
     "tabs": {
@@ -63,7 +64,19 @@
         "searchRateLimitError": "搜索请求过于频繁。您也可访问 ClawHub.ai 搜索并下载压缩包，解压到 \"{{path}}\"",
         "installRateLimitError": "安装请求过于频繁。您也可在 ClawHub.ai 下载该技能压缩包，解压到 \"{{path}}\"",
         "fetchTimeoutError": "获取技能列表超时，请检查网络。",
-        "fetchRateLimitError": "获取技能列表请求过于频繁，请稍后再试。"
+        "fetchRateLimitError": "获取技能列表请求过于频繁，请稍后再试。",
+        "importSuccess": "技能压缩包导入成功",
+        "importFailed": "导入失败",
+        "importNotZip": "请拖入 .zip 格式的技能压缩包"
+    },
+    "importDialog": {
+        "title": "选择技能压缩包",
+        "filterName": "技能压缩包 (*.zip)"
+    },
+    "dropZone": {
+        "title": "拖入技能压缩包",
+        "subtitle": "将从 ClawHub 下载的 .zip 文件拖到此处即可安装",
+        "importing": "正在解压安装..."
     },
     "marketplace": {
         "title": "市场",

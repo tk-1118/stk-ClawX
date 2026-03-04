@@ -2,7 +2,7 @@
  * Preload Script
  * Exposes safe APIs to the renderer process via contextBridge
  */
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
 /**
  * IPC renderer methods exposed to the renderer process
@@ -114,6 +114,7 @@ const electronAPI = {
         'skill:updateConfig',
         'skill:getConfig',
         'skill:getAllConfigs',
+        'skill:importZip',
         // Logs
         'log:getRecent',
         'log:readFile',
@@ -243,6 +244,12 @@ const electronAPI = {
   openExternal: (url: string) => {
     return ipcRenderer.invoke('shell:openExternal', url);
   },
+
+  /**
+   * Get the real filesystem path for a File object obtained from drag-and-drop.
+   * Replaces the deprecated file.path property (removed in Electron 32+).
+   */
+  getPathForFile: (file: File) => webUtils.getPathForFile(file),
 
   /**
    * Get current platform

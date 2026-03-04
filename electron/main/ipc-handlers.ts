@@ -6,7 +6,11 @@ import { ipcMain, BrowserWindow, shell, dialog, app, nativeImage } from 'electro
 import { existsSync, cpSync, mkdirSync, rmSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, extname, basename } from 'node:path';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import crypto from 'node:crypto';
+
+const execFileAsync = promisify(execFile);
 import { GatewayManager } from '../gateway/manager';
 import { ClawHubService, ClawHubSearchParams, ClawHubInstallParams, ClawHubUninstallParams } from '../gateway/clawhub';
 import {
@@ -1711,6 +1715,33 @@ function registerShellHandlers(): void {
 }
 
 /**
+ * Parse zip listing output to find the unique top-level directory names.
+ * Handles paths like "skill-name/file.py" or "skill-name/" or bare "file.py".
+ */
+function getZipTopLevelDirs(listing: string): Set<string> {
+  const dirs = new Set<string>();
+  for (const line of listing.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    // Normalize separators and strip leading "./"
+    const normalized = trimmed.replace(/\\/g, '/').replace(/^\.\//, '');
+    const first = normalized.split('/')[0];
+    if (first && first !== '__MACOSX' && first !== '.') {
+      dirs.add(first);
+    }
+  }
+  return dirs;
+}
+
+/**
+ * Derive a safe skill slug from the zip filename.
+ */
+function deriveSlugFromFilename(filePath: string): string {
+  const name = basename(filePath, '.zip');
+  return name.toLowerCase().replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'imported-skill';
+}
+
+/**
  * ClawHub-related IPC handlers
  */
 function registerClawHubHandlers(clawHubService: ClawHubService): void {
@@ -1759,6 +1790,80 @@ function registerClawHubHandlers(clawHubService: ClawHubService): void {
     try {
       await clawHubService.openSkillReadme(slug);
       return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  // Import skill from local zip file (uses OS-native unzip for broad format support)
+  ipcMain.handle('skill:importZip', async (_, filePath: string) => {
+    try {
+      const skillsDir = getOpenClawSkillsDir();
+      ensureDir(skillsDir);
+
+      const slugs: string[] = [];
+      const isWin = process.platform === 'win32';
+
+      if (isWin) {
+        // Windows: use PowerShell / .NET ZipFile for listing and extraction
+        const { stdout: listing } = await execFileAsync('powershell.exe', [
+          '-NoProfile', '-NonInteractive', '-Command',
+          `Add-Type -AssemblyName System.IO.Compression.FileSystem; ` +
+          `$z = [System.IO.Compression.ZipFile]::OpenRead([System.IO.Path]::GetFullPath('${filePath.replace(/'/g, "''")}')); ` +
+          `$z.Entries | ForEach-Object { $_.FullName }; ` +
+          `$z.Dispose()`,
+        ]);
+
+        const topDirs = getZipTopLevelDirs(listing);
+        if (topDirs.size === 0) throw new Error('Zip file contains no valid skill files');
+
+        if (topDirs.size === 1) {
+          await execFileAsync('powershell.exe', [
+            '-NoProfile', '-NonInteractive', '-Command',
+            `Expand-Archive -LiteralPath '${filePath.replace(/'/g, "''")}' -DestinationPath '${skillsDir.replace(/'/g, "''")}' -Force`,
+          ]);
+          slugs.push(...topDirs);
+        } else {
+          const slug = deriveSlugFromFilename(filePath);
+          const targetDir = join(skillsDir, slug);
+          ensureDir(targetDir);
+          await execFileAsync('powershell.exe', [
+            '-NoProfile', '-NonInteractive', '-Command',
+            `Expand-Archive -LiteralPath '${filePath.replace(/'/g, "''")}' -DestinationPath '${targetDir.replace(/'/g, "''")}' -Force`,
+          ]);
+          slugs.push(slug);
+        }
+      } else {
+        // macOS / Linux: use system unzip (always available, supports all standard formats)
+        const unzipBin = '/usr/bin/unzip';
+
+        // -Z1: zipinfo mode, one filename per line – works without extracting
+        const { stdout: listing } = await execFileAsync(unzipBin, ['-Z1', filePath]);
+        const topDirs = getZipTopLevelDirs(listing);
+        if (topDirs.size === 0) throw new Error('Zip file contains no valid skill files');
+
+        if (topDirs.size === 1) {
+          // Single top-level folder → extract to skillsDir; the folder becomes the skill dir
+          await execFileAsync(unzipBin, ['-o', filePath, '-d', skillsDir]);
+          slugs.push(...topDirs);
+        } else {
+          // Flat zip (files at root) or multiple top-level entries →
+          // derive the slug from the zip filename and extract into a dedicated subfolder
+          const slug = deriveSlugFromFilename(filePath);
+          const targetDir = join(skillsDir, slug);
+          ensureDir(targetDir);
+          await execFileAsync(unzipBin, ['-o', filePath, '-d', targetDir]);
+          slugs.push(slug);
+        }
+      }
+
+      // Remove macOS metadata folder if present
+      const macosxDir = join(skillsDir, '__MACOSX');
+      if (existsSync(macosxDir)) {
+        rmSync(macosxDir, { recursive: true, force: true });
+      }
+
+      return { success: true, slugs };
     } catch (error) {
       return { success: false, error: String(error) };
     }
