@@ -1684,11 +1684,20 @@ export const useChatStore = create<ChatState>((set, get) => ({
               ...clearPendingImages,
             };
           });
-          // After the final response, quietly reload history to surface all intermediate
-          // tool-use turns (thinking + tool blocks) from the Gateway's authoritative record.
+          // After the final response, reload history only when there were intermediate
+          // tool-use turns that need to be surfaced from the Gateway's authoritative record.
+          // Skipping the reload for plain-text responses avoids a redundant second state
+          // update that would replace messages[] immediately after the final event fires.
           if (hasOutput && !toolOnly) {
             clearHistoryPoll();
-            void get().loadHistory(true);
+            const hadIntermediateTools = get().messages.some(
+              m => m.role === 'assistant' && isToolOnlyMessage(m as RawMessage),
+            );
+            if (hadIntermediateTools) {
+              // Delay so any typewriter animation has time to complete before the reload
+              // replaces messages[] with the authoritative history.
+              setTimeout(() => void get().loadHistory(true), 800);
+            }
           }
         } else {
           // No message in final event - reload history to get complete data

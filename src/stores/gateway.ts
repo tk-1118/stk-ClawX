@@ -7,6 +7,22 @@ import type { GatewayStatus } from '../types/gateway';
 
 let gatewayInitPromise: Promise<void> | null = null;
 
+// Module-level cache for the chat store module.
+// Avoids going through the dynamic import → microtask queue on every
+// incoming delta event, which adds latency during high-frequency streaming.
+let _chatStoreModule: typeof import('./chat') | null = null;
+
+function dispatchChatEvent(event: Record<string, unknown>): void {
+  if (_chatStoreModule) {
+    _chatStoreModule.useChatStore.getState().handleChatEvent(event);
+  } else {
+    import('./chat').then(m => {
+      _chatStoreModule = m;
+      m.useChatStore.getState().handleChatEvent(event);
+    }).catch(() => {});
+  }
+}
+
 interface GatewayHealth {
   ok: boolean;
   error?: string;
@@ -87,26 +103,14 @@ export const useGatewayStore = create<GatewayState>((set, get) => ({
               state: p.state ?? data.state,
               message: p.message ?? data.message,
             };
-            import('./chat')
-              .then(({ useChatStore }) => {
-                useChatStore.getState().handleChatEvent(normalizedEvent);
-              })
-              .catch(() => {});
+            dispatchChatEvent(normalizedEvent);
           }
 
           // When a run starts (e.g. user clicked Send on console), show loading in the app immediately.
           const runId = p.runId ?? data.runId;
           const sessionKey = p.sessionKey ?? data.sessionKey;
           if (phase === 'started' && runId != null && sessionKey != null) {
-            import('./chat')
-              .then(({ useChatStore }) => {
-                useChatStore.getState().handleChatEvent({
-                  state: 'started',
-                  runId,
-                  sessionKey,
-                });
-              })
-              .catch(() => {});
+            dispatchChatEvent({ state: 'started', runId, sessionKey });
           }
 
           // When the agent run completes, reload history to get the final response.
@@ -138,24 +142,22 @@ export const useGatewayStore = create<GatewayState>((set, get) => ({
         // or the raw chat message itself. We need to handle both.
         window.electron.ipcRenderer.on('gateway:chat-message', (data) => {
           try {
-            import('./chat').then(({ useChatStore }) => {
-              const chatData = data as Record<string, unknown>;
-              const payload = ('message' in chatData && typeof chatData.message === 'object')
-                ? chatData.message as Record<string, unknown>
-                : chatData;
+            const chatData = data as Record<string, unknown>;
+            const payload = ('message' in chatData && typeof chatData.message === 'object')
+              ? chatData.message as Record<string, unknown>
+              : chatData;
 
-              if (payload.state) {
-                useChatStore.getState().handleChatEvent(payload);
-                return;
-              }
+            if (payload.state) {
+              dispatchChatEvent(payload);
+              return;
+            }
 
-              // Raw message without state wrapper — treat as final
-              useChatStore.getState().handleChatEvent({
-                state: 'final',
-                message: payload,
-                runId: chatData.runId ?? payload.runId,
-              });
-            }).catch(() => {});
+            // Raw message without state wrapper — treat as final
+            dispatchChatEvent({
+              state: 'final',
+              message: payload,
+              runId: chatData.runId ?? payload.runId,
+            });
           } catch {
             // Silently ignore forwarding failures
           }
@@ -170,16 +172,9 @@ export const useGatewayStore = create<GatewayState>((set, get) => ({
 
           // Try to detect if this is a chat-related event and forward it
           if (msg.state && msg.message) {
-            import('./chat').then(({ useChatStore }) => {
-              useChatStore.getState().handleChatEvent(msg);
-            }).catch(() => {});
+            dispatchChatEvent(msg);
           } else if (msg.role && msg.content) {
-            import('./chat').then(({ useChatStore }) => {
-              useChatStore.getState().handleChatEvent({
-                state: 'final',
-                message: msg,
-              });
-            }).catch(() => {});
+            dispatchChatEvent({ state: 'final', message: msg });
           }
         });
 

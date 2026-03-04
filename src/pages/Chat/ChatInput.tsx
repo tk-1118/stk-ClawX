@@ -368,7 +368,7 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false }:
                 isComposingRef.current = false;
               }}
               onPaste={handlePaste}
-              placeholder={disabled ? 'Gateway not connected...' : 'Message (Enter to send, Shift+Enter for new line)'}
+              placeholder={disabled ? '网关未连接...' : '消息（Enter 发送，Shift+Enter 换行）'}
               disabled={disabled}
               className="min-h-[44px] max-h-[200px] resize-none pr-4"
               rows={1}

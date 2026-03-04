@@ -16,6 +16,23 @@ import { ChatToolbar } from './ChatToolbar';
 import { extractImages, extractText, extractThinking, extractToolUse } from './message-utils';
 import { useTranslation } from 'react-i18next';
 
+// Debounce a boolean flag going from false→true.
+// The true state is only exposed after `delay` ms, so rapid flickers
+// (e.g. fast tool calls completing in < delay) are swallowed entirely.
+// The false state is applied immediately so the indicator clears without lag.
+function useDebouncedFlag(value: boolean, delay: number): boolean {
+  const [debounced, setDebounced] = useState(false);
+  useEffect(() => {
+    if (!value) {
+      setDebounced(false);
+      return;
+    }
+    const t = setTimeout(() => setDebounced(true), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+}
+
 export function Chat() {
   const { t } = useTranslation('chat');
   const gatewayStatus = useGatewayStore((s) => s.status);
@@ -39,6 +56,11 @@ export function Chat() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [streamingTimestamp, setStreamingTimestamp] = useState<number>(0);
+
+  // Delay showing the ActivityIndicator to avoid flashing for fast tool calls.
+  // The indicator only appears after 300ms of continuous pendingFinal state,
+  // and disappears immediately when pendingFinal clears.
+  const showActivityIndicator = useDebouncedFlag(sending && pendingFinal, 300);
 
   // Load data when gateway is running.
   // When the store already holds messages for this session (i.e. the user
@@ -152,8 +174,9 @@ export function Chat() {
                 />
               )}
 
-              {/* Activity indicator: waiting for next AI turn after tool execution */}
-              {sending && pendingFinal && !shouldRenderStreaming && (
+              {/* Activity indicator: waiting for next AI turn after tool execution.
+                  Delayed 300ms to avoid flashing for fast tool calls. */}
+              {showActivityIndicator && !shouldRenderStreaming && (
                 <ActivityIndicator phase="tool_processing" />
               )}
 

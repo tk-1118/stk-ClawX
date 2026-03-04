@@ -3,7 +3,7 @@
  * Renders user / assistant / system / toolresult messages
  * with markdown, thinking sections, images, and tool cards.
  */
-import { useState, useCallback, useEffect, memo } from 'react';
+import { useState, useCallback, useEffect, useRef, memo } from 'react';
 import { User, Sparkles, Copy, Check, ChevronDown, ChevronRight, Wrench, FileText, Film, Music, FileArchive, File, X, FolderOpen, ZoomIn, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -324,6 +324,46 @@ function AssistantHoverBar({ text, timestamp }: { text: string; timestamp?: numb
   );
 }
 
+// ── Typewriter Hook ─────────────────────────────────────────────
+// 在 streamingMessage 跳跃更新与实际字符显示之间插入缓冲层。
+// 每帧追加 CHARS_PER_FRAME 个字符，isStreaming=false 时立即跳到全文。
+
+function useTypewriter(targetText: string, isStreaming: boolean): string {
+  const [displayed, setDisplayed] = useState(targetText);
+  const targetRef = useRef(targetText);
+  const rafRef = useRef<number>(0);
+
+  // 同步 ref 到最新目标（避免 tick 闭包中读到旧值）
+  useEffect(() => {
+    targetRef.current = targetText;
+  }, [targetText]);
+
+  useEffect(() => {
+    if (!isStreaming) {
+      // 流式结束：取消动画，立即显示完整文本
+      cancelAnimationFrame(rafRef.current);
+      setDisplayed(targetText);
+      return;
+    }
+
+    const CHARS_PER_FRAME = 6; // ~360 字符/秒 @60fps，可调节
+
+    const tick = () => {
+      setDisplayed(prev => {
+        const target = targetRef.current;
+        if (prev.length >= target.length) return target;
+        return target.slice(0, prev.length + CHARS_PER_FRAME);
+      });
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [isStreaming]); // targetText 变化由 ref 处理，不重启 effect
+
+  return displayed;
+}
+
 // ── Message Bubble ──────────────────────────────────────────────
 
 function MessageBubble({
@@ -335,6 +375,8 @@ function MessageBubble({
   isUser: boolean;
   isStreaming: boolean;
 }) {
+  const displayedText = useTypewriter(text, isStreaming);
+
   return (
     <div
       className={cn(
@@ -347,7 +389,16 @@ function MessageBubble({
     >
       {isUser ? (
         <p className="whitespace-pre-wrap break-words break-all text-sm">{text}</p>
+      ) : isStreaming ? (
+        // 流式阶段：纯文本渲染 + typewriter 光标，跳过 ReactMarkdown 的 AST 解析开销
+        <div className="prose prose-sm dark:prose-invert max-w-none break-words break-all">
+          <p className="whitespace-pre-wrap break-words break-all text-sm leading-relaxed m-0">
+            {displayedText}
+            <span className="inline-block w-2 h-4 bg-foreground/50 animate-pulse ml-0.5 align-text-bottom" />
+          </p>
+        </div>
       ) : (
+        // 完成阶段：完整 markdown 渲染
         <div className="prose prose-sm dark:prose-invert max-w-none break-words break-all">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
@@ -381,9 +432,6 @@ function MessageBubble({
           >
             {text}
           </ReactMarkdown>
-          {isStreaming && (
-            <span className="inline-block w-2 h-4 bg-foreground/50 animate-pulse ml-0.5" />
-          )}
         </div>
       )}
 
