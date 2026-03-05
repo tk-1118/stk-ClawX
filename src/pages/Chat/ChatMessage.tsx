@@ -4,7 +4,7 @@
  * with markdown, thinking sections, images, and tool cards.
  */
 import { useState, useCallback, useEffect, useRef, memo } from 'react';
-import { User, Sparkles, Copy, Check, ChevronDown, ChevronRight, Wrench, FileText, Film, Music, FileArchive, File, X, FolderOpen, ZoomIn, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { User, Sparkles, Copy, Check, ChevronDown, ChevronRight, Wrench, FileText, Film, Music, FileArchive, File, X, FolderOpen, ZoomIn, Loader2, CheckCircle2, AlertCircle, ExternalLink, FileSpreadsheet, FileCode, FileImage } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { createPortal } from 'react-dom';
@@ -407,6 +407,10 @@ function MessageBubble({
                 const match = /language-(\w+)/.exec(className || '');
                 const isInline = !match && !className;
                 if (isInline) {
+                  const text = typeof children === 'string' ? children : String(children ?? '');
+                  if (isFilePath(text)) {
+                    return <FilePathInlineCode path={text} />;
+                  }
                   return (
                     <code className="bg-background/50 px-1.5 py-0.5 rounded text-sm font-mono break-words break-all" {...props}>
                       {children}
@@ -422,6 +426,10 @@ function MessageBubble({
                 );
               },
               a({ href, children }) {
+                // File-path links (e.g. file:// or bare absolute paths used as hrefs)
+                if (href && isFilePath(href)) {
+                  return <FilePathInlineCode path={href} />;
+                }
                 return (
                   <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-words break-all">
                     {children}
@@ -464,6 +472,79 @@ function ThinkingBlock({ content }: { content: string }) {
   );
 }
 
+// ── File Path Detection & Inline Component ──────────────────────
+
+/** Returns true if the string looks like a local filesystem path. */
+function isFilePath(text: string): boolean {
+  const s = text.trim();
+  if (s.length < 2 || s.includes('\n')) return false;
+  // Unix absolute: /foo/bar or ~/foo
+  if (/^(\/|~\/)/.test(s)) return true;
+  // Windows absolute: C:\ or C:/
+  if (/^[A-Za-z]:[/\\]/.test(s)) return true;
+  // Relative paths with an explicit dot prefix: ./foo or ../foo
+  if (/^\.\.?[/\\]/.test(s)) return true;
+  return false;
+}
+
+/**
+ * Renders an inline code span that looks like a file path.
+ * - Click on the text → open with the default application.
+ * - Hover → show a small "show in folder" icon button.
+ */
+function FilePathInlineCode({ path }: { path: string }) {
+  const [hovered, setHovered] = useState(false);
+
+  const handleOpen = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.electron.ipcRenderer.invoke('shell:openPath', path);
+  }, [path]);
+
+  const handleShowInFolder = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.electron.ipcRenderer.invoke('shell:showItemInFolder', path);
+  }, [path]);
+
+  return (
+    <span
+      className="inline-flex items-center gap-0.5 align-baseline"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <code
+        className="bg-background/50 px-1.5 py-0.5 rounded text-sm font-mono break-all cursor-pointer hover:bg-primary/15 hover:text-primary transition-colors"
+        onClick={handleOpen}
+        title="点击打开文件"
+      >
+        {path}
+      </code>
+      <span
+        className={cn(
+          'inline-flex items-center gap-0.5 transition-opacity duration-150',
+          hovered ? 'opacity-100' : 'opacity-0 pointer-events-none',
+        )}
+      >
+        <button
+          className="p-0.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          onClick={handleOpen}
+          title="用默认程序打开文件"
+        >
+          <ExternalLink className="h-3 w-3" />
+        </button>
+        <button
+          className="p-0.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          onClick={handleShowInFolder}
+          title="在文件夹中显示"
+        >
+          <FolderOpen className="h-3 w-3" />
+        </button>
+      </span>
+    </span>
+  );
+}
+
 // ── File Card (for user-uploaded non-image files) ───────────────
 
 function formatFileSize(bytes: number): string {
@@ -476,22 +557,96 @@ function formatFileSize(bytes: number): string {
 function FileIcon({ mimeType, className }: { mimeType: string; className?: string }) {
   if (mimeType.startsWith('video/')) return <Film className={className} />;
   if (mimeType.startsWith('audio/')) return <Music className={className} />;
-  if (mimeType.startsWith('text/') || mimeType === 'application/json' || mimeType === 'application/xml') return <FileText className={className} />;
-  if (mimeType.includes('zip') || mimeType.includes('compressed') || mimeType.includes('archive') || mimeType.includes('tar') || mimeType.includes('rar') || mimeType.includes('7z')) return <FileArchive className={className} />;
-  if (mimeType === 'application/pdf') return <FileText className={className} />;
+  if (mimeType.startsWith('image/')) return <FileImage className={className} />;
+  // Spreadsheets: xlsx, xls, csv
+  if (
+    mimeType === 'text/csv' ||
+    mimeType.includes('spreadsheet') ||
+    mimeType === 'application/vnd.ms-excel'
+  ) return <FileSpreadsheet className={className} />;
+  // Code / structured text: json, xml, html, code files
+  if (
+    mimeType === 'application/json' ||
+    mimeType === 'application/xml' ||
+    mimeType === 'text/html' ||
+    mimeType === 'text/css' ||
+    mimeType === 'text/javascript' ||
+    mimeType === 'application/javascript'
+  ) return <FileCode className={className} />;
+  // Plain text, markdown, PDF, Word, Presentation → document icon
+  if (
+    mimeType.startsWith('text/') ||
+    mimeType === 'application/pdf' ||
+    mimeType.includes('wordprocessingml') ||
+    mimeType === 'application/msword' ||
+    mimeType.includes('presentationml') ||
+    mimeType === 'application/vnd.ms-powerpoint' ||
+    mimeType === 'application/rtf' ||
+    mimeType === 'application/epub+zip'
+  ) return <FileText className={className} />;
+  // Archives
+  if (
+    mimeType.includes('zip') ||
+    mimeType.includes('compressed') ||
+    mimeType.includes('archive') ||
+    mimeType.includes('tar') ||
+    mimeType.includes('rar') ||
+    mimeType.includes('7z')
+  ) return <FileArchive className={className} />;
   return <File className={className} />;
 }
 
 function FileCard({ file }: { file: AttachedFileMeta }) {
+  const hasPath = Boolean(file.filePath);
+
+  const handleOpen = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (file.filePath) {
+      window.electron.ipcRenderer.invoke('shell:openPath', file.filePath);
+    }
+  }, [file.filePath]);
+
+  const handleShowInFolder = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (file.filePath) {
+      window.electron.ipcRenderer.invoke('shell:showItemInFolder', file.filePath);
+    }
+  }, [file.filePath]);
+
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 bg-muted/30 max-w-[220px]">
+    <div
+      className={cn(
+        'group/fc flex items-center gap-2 rounded-lg border border-border px-3 py-2 bg-muted/30 max-w-[260px] transition-colors',
+        hasPath && 'cursor-pointer hover:bg-muted/60 hover:border-border/80',
+      )}
+      onClick={hasPath ? handleOpen : undefined}
+      title={hasPath ? '点击打开文件' : undefined}
+    >
       <FileIcon mimeType={file.mimeType} className="h-5 w-5 shrink-0 text-muted-foreground" />
-      <div className="min-w-0 overflow-hidden">
+      <div className="min-w-0 flex-1 overflow-hidden">
         <p className="text-xs font-medium truncate">{file.fileName}</p>
         <p className="text-[10px] text-muted-foreground">
           {file.fileSize > 0 ? formatFileSize(file.fileSize) : 'File'}
         </p>
       </div>
+      {hasPath && (
+        <div className="flex items-center gap-0.5 opacity-0 group-hover/fc:opacity-100 transition-opacity shrink-0">
+          <button
+            className="p-0.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            onClick={handleOpen}
+            title="用默认程序打开"
+          >
+            <ExternalLink className="h-3 w-3" />
+          </button>
+          <button
+            className="p-0.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            onClick={handleShowInFolder}
+            title="在文件夹中显示"
+          >
+            <FolderOpen className="h-3 w-3" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
