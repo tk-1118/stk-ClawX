@@ -260,8 +260,8 @@ function WelcomeScreen() {
 function TypingIndicator() {
   return (
     <div className="flex gap-3">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-        <Sparkles className="h-4 w-4" />
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+        <img src={logoSvg} alt="" className="h-8 w-8 object-contain p-1 border border-gray-200 rounded-full" />
       </div>
       <div className="bg-muted rounded-2xl px-4 py-3">
         <div className="flex gap-1">
@@ -280,8 +280,8 @@ function ActivityIndicator({ phase }: { phase: 'tool_processing' }) {
   void phase;
   return (
     <div className="flex gap-3">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-        <Sparkles className="h-4 w-4" />
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+        <img src={logoSvg} alt="" className="h-8 w-8 object-contain p-1 border border-gray-200 rounded-full" />
       </div>
       <div className="bg-muted rounded-2xl px-4 py-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
