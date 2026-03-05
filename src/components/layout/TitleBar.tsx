@@ -5,7 +5,7 @@
  */
 import { useState, useEffect } from 'react';
 import { Minus, Square, X, Copy } from 'lucide-react';
-import logoSvg from '@/assets/logo.svg';
+import logoSvg from '@/assets/logo2.png';
 
 const isMac = window.electron?.platform === 'darwin';
 
@@ -49,9 +49,9 @@ function WindowsTitleBar() {
       {/* Left: Icon + App Name */}
       <div className="no-drag flex items-center gap-2 pl-3">
         <img src={logoSvg} alt="HNClaw" className="h-5 w-auto" />
-        <span className="text-xs font-medium text-muted-foreground select-none">
+        {/* <span className="text-xs font-medium text-muted-foreground select-none">
           HNClaw
-        </span>
+        </span> */}
       </div>
 
       {/* Right: Window Controls */}
