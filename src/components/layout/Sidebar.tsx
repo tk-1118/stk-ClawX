@@ -127,11 +127,11 @@ export function Sidebar() {
       {/* Logo + title */}
       <div
         className={cn(
-          'flex shrink-0 items-center gap-3 border-b px-3 py-4',
+          'flex shrink-0 items-center gap-2 border-b px-3 py-4',
           sidebarCollapsed ? 'justify-center px-2' : 'px-3'
         )}
       >
-        <img src={logoSvg} alt="" className="h-8 w-8 shrink-0 object-contain" />
+        <img src={logoSvg} alt="" className="h-6 w-6 shrink-0 object-contain" />
         {!sidebarCollapsed && (
           <span className="truncate text-base font-semibold text-foreground">HNClaw</span>
         )}
