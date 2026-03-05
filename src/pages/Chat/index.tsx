@@ -5,7 +5,7 @@
  * are in the toolbar; messages render with markdown + streaming.
  */
 import { useEffect, useRef, useState } from 'react';
-import { AlertCircle, Bot, Loader2, MessageSquare, Sparkles } from 'lucide-react';
+import { AlertCircle, FileImage, Loader2, MessageSquare, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useChatStore, type RawMessage } from '@/stores/chat';
 import { useGatewayStore } from '@/stores/gateway';
@@ -15,6 +15,7 @@ import { ChatInput } from './ChatInput';
 import { ChatToolbar } from './ChatToolbar';
 import { extractImages, extractText, extractThinking, extractToolUse } from './message-utils';
 import { useTranslation } from 'react-i18next';
+import logoSvg from '@/assets/logo.svg';
 
 // Debounce a boolean flag going from false→true.
 // The true state is only exposed after `delay` ms, so rapid flickers
@@ -227,18 +228,19 @@ function WelcomeScreen() {
   const { t } = useTranslation('chat');
   return (
     <div className="flex flex-col items-center justify-center text-center py-20">
-      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-6">
-        <Bot className="h-8 w-8 text-white" />
+      <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
+        <img src={logoSvg} alt="Logo" className="h-10 w-10 object-contain" />
       </div>
       <h2 className="text-2xl font-bold mb-2">{t('welcome.title')}</h2>
       <p className="text-muted-foreground mb-8 max-w-md">
         {t('welcome.subtitle')}
       </p>
 
-      <div className="grid grid-cols-2 gap-4 max-w-lg w-full">
+      <div className="grid grid-cols-3 gap-4 max-w-lg w-full">
         {[
           { icon: MessageSquare, title: t('welcome.askQuestions'), desc: t('welcome.askQuestionsDesc') },
           { icon: Sparkles, title: t('welcome.creativeTasks'), desc: t('welcome.creativeTasksDesc') },
+          { icon: FileImage, title: t('welcome.collectMaterials'), desc: t('welcome.collectMaterialsDesc') },
         ].map((item, i) => (
           <Card key={i} className="text-left">
             <CardContent className="p-4">

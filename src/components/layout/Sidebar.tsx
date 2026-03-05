@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useTranslation } from 'react-i18next';
+import logoSvg from '@/assets/logo.svg';
 
 interface NavItemProps {
   to: string;
@@ -123,6 +124,18 @@ export function Sidebar() {
         sidebarCollapsed ? 'w-16' : 'w-64'
       )}
     >
+      {/* Logo + title */}
+      <div
+        className={cn(
+          'flex shrink-0 items-center gap-3 border-b px-3 py-4',
+          sidebarCollapsed ? 'justify-center px-2' : 'px-3'
+        )}
+      >
+        <img src={logoSvg} alt="" className="h-8 w-8 shrink-0 object-contain" />
+        {!sidebarCollapsed && (
+          <span className="truncate text-base font-semibold text-foreground">HNClaw</span>
+        )}
+      </div>
       {/* Navigation */}
       <nav className="flex-1 overflow-hidden flex flex-col p-2 gap-1">
         {/* Chat nav item: acts as "New Chat" button, never highlighted as active */}

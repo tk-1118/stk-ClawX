@@ -4,7 +4,7 @@
  * with markdown, thinking sections, images, and tool cards.
  */
 import { useState, useCallback, useEffect, useRef, memo } from 'react';
-import { User, Sparkles, Copy, Check, ChevronDown, ChevronRight, Wrench, FileText, Film, Music, FileArchive, File, X, FolderOpen, ZoomIn, Loader2, CheckCircle2, AlertCircle, ExternalLink, FileSpreadsheet, FileCode, FileImage } from 'lucide-react';
+import { User, Copy, Check, ChevronDown, ChevronRight, Wrench, FileText, Film, Music, FileArchive, File, X, FolderOpen, ZoomIn, Loader2, CheckCircle2, AlertCircle, ExternalLink, FileSpreadsheet, FileCode, FileImage } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { createPortal } from 'react-dom';
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { RawMessage, AttachedFileMeta } from '@/stores/chat';
 import { extractText, extractThinking, extractImages, extractToolUse, formatTimestamp } from './message-utils';
+import logoSvg from '@/assets/logo.svg';
 
 interface ChatMessageProps {
   message: RawMessage;
@@ -73,12 +74,10 @@ export const ChatMessage = memo(function ChatMessage({
       <div
         className={cn(
           'flex h-8 w-8 shrink-0 items-center justify-center rounded-full mt-1',
-          isUser
-            ? 'bg-primary text-primary-foreground'
-            : 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white',
+          isUser && 'bg-primary text-primary-foreground',
         )}
       >
-        {isUser ? <User className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
+        {isUser ? <User className="h-4 w-4" /> : <img src={logoSvg} alt="" className="h-8 w-8 object-contain p-1 border border-gray-200 rounded-full" />}
       </div>
 
       {/* Content */}
