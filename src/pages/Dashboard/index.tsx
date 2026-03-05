@@ -125,7 +125,7 @@ export function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Status Cards */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Gateway Status */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -145,7 +145,7 @@ export function Dashboard() {
         </Card>
 
         {/* Channels */}
-        {/* <Card>
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">{t('channels')}</CardTitle>
             <Radio className="h-4 w-4 text-muted-foreground" />
@@ -156,7 +156,7 @@ export function Dashboard() {
               {t('connectedOf', { connected: connectedChannels, total: channels.length })}
             </p>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Skills */}
         <Card>
@@ -196,13 +196,13 @@ export function Dashboard() {
           <CardDescription>{t('quickActions.description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-            {/* <Button variant="outline" className="h-auto flex-col gap-2 py-4" asChild>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            <Button variant="outline" className="h-auto flex-col gap-2 py-4" asChild>
               <Link to="/channels">
                 <Plus className="h-5 w-5" />
                 <span>{t('quickActions.addChannel')}</span>
               </Link>
-            </Button> */}
+            </Button>
             <Button variant="outline" className="h-auto flex-col gap-2 py-4" asChild>
               <Link to="/skills">
                 <Puzzle className="h-5 w-5" />
@@ -238,7 +238,7 @@ export function Dashboard() {
       {/* Recent Activity */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-1">
         {/* Connected Channels */}
-        {/* <Card>
+        <Card>
           <CardHeader>
             <CardTitle className="text-lg">{t('connectedChannels')}</CardTitle>
           </CardHeader>
@@ -277,7 +277,7 @@ export function Dashboard() {
               </div>
             )}
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Enabled Skills */}
         <Card>
