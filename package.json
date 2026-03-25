@@ -1,5 +1,5 @@
 {
-    "name": "HNClaw",
+    "name": "STKClaw",
     "version": "0.1.22-beta.0",
     "pnpm": {
         "onlyBuiltDependencies": [
@@ -11,9 +11,9 @@
             "sharp"
         ]
     },
-    "description": "HNClaw - Graphical AI Assistant based on OpenClaw",
+    "description": "STKClaw - Graphical AI Assistant based on OpenClaw",
     "main": "dist-electron/main/index.js",
-    "author": "HNClaw Team",
+    "author": "STKClaw Team",
     "license": "MIT",
     "private": true,
     "scripts": {

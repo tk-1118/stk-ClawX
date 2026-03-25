@@ -1,9 +1,9 @@
 
 <p align="center">
-  <img src="src/assets/logo.svg" width="128" height="128" alt="HNClaw Logo" />
+  <img src="src/assets/logo.svg" width="128" height="128" alt="STKClaw Logo" />
 </p>
 
-<h1 align="center">HNClaw</h1>
+<h1 align="center">STKClaw</h1>
 
 <p align="center">
   <strong>OpenClaw AI 智能体的桌面客户端</strong>
@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="#功能特性">功能特性</a> •
-  <a href="#为什么选择-clawx">为什么选择 HNClaw</a> •
+  <a href="#为什么选择-clawx">为什么选择 STKClaw</a> •
   <a href="#快速上手">快速上手</a> •
   <a href="#系统架构">系统架构</a> •
   <a href="#开发指南">开发指南</a> •
@@ -25,7 +25,7 @@
   <a href="https://discord.com/invite/84Kex3GGAh" target="_blank">
   <img src="https://img.shields.io/discord/1399603591471435907?logo=discord&labelColor=%20%235462eb&logoColor=%20%23f5f5f5&color=%20%235462eb" alt="chat on Discord" />
   </a>
-  <img src="https://img.shields.io/github/downloads/ValueCell-ai/HNClaw/total?color=%23027DEB" alt="Downloads" />
+  <img src="https://img.shields.io/github/downloads/ValueCell-ai/STKClaw/total?color=%23027DEB" alt="Downloads" />
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
 </p>
 
@@ -37,11 +37,11 @@
 
 ## 概述
 
-**HNClaw** 是连接强大 AI 智能体与普通用户之间的桥梁。基于 [OpenClaw](https://github.com/OpenClaw) 构建，它将命令行式的 AI 编排转变为易用、美观的桌面体验——无需使用终端。
+**STKClaw** 是连接强大 AI 智能体与普通用户之间的桥梁。基于 [OpenClaw](https://github.com/OpenClaw) 构建，它将命令行式的 AI 编排转变为易用、美观的桌面体验——无需使用终端。
 
-无论是自动化工作流、连接通讯软件，还是调度智能定时任务，HNClaw 都能提供高效易用的图形界面，帮助你充分发挥 AI 智能体的能力。
+无论是自动化工作流、连接通讯软件，还是调度智能定时任务，STKClaw 都能提供高效易用的图形界面，帮助你充分发挥 AI 智能体的能力。
 
-HNClaw 预置了最佳实践的模型供应商配置，原生支持 Windows 平台以及多语言设置。当然，你也可以通过 **设置 → 高级 → 开发者模式** 来进行精细的高级配置。
+STKClaw 预置了最佳实践的模型供应商配置，原生支持 Windows 平台以及多语言设置。当然，你也可以通过 **设置 → 高级 → 开发者模式** 来进行精细的高级配置。
 
 ---
 
@@ -73,11 +73,11 @@ HNClaw 预置了最佳实践的模型供应商配置，原生支持 Windows 平�
 
 ---
 
-## 为什么选择 HNClaw
+## 为什么选择 STKClaw
 
-构建 AI 智能体不应该需要精通命令行。HNClaw 的设计理念很简单：**强大的技术值得拥有一个尊重用户时间的界面。**
+构建 AI 智能体不应该需要精通命令行。STKClaw 的设计理念很简单：**强大的技术值得拥有一个尊重用户时间的界面。**
 
-| 痛点 | HNClaw 解决方案 |
+| 痛点 | STKClaw 解决方案 |
 |------|----------------|
 | 复杂的命令行配置 | 一键安装，配合引导式设置向导 |
 | 手动编辑配置文件 | 可视化设置界面，实时校验 |
@@ -87,7 +87,7 @@ HNClaw 预置了最佳实践的模型供应商配置，原生支持 Windows 平�
 
 ### 内置 OpenClaw 核心
 
-HNClaw 直接基于官方 **OpenClaw** 核心构建。无需单独安装，我们将运行时嵌入应用内部，提供开箱即用的无缝体验。
+STKClaw 直接基于官方 **OpenClaw** 核心构建。无需单独安装，我们将运行时嵌入应用内部，提供开箱即用的无缝体验。
 
 我们致力于与上游 OpenClaw 项目保持严格同步，确保你始终可以使用官方发布的最新功能、稳定性改进和生态兼容性。
 
@@ -114,7 +114,7 @@ HNClaw 直接基于官方 **OpenClaw** 核心构建。无需单独安装，我�
 连接多个 AI 供应商（OpenAI、Anthropic 等），凭证安全存储在系统原生密钥链中。
 
 ### 🌙 自适应主题
-支持浅色模式、深色模式或跟随系统主题。HNClaw 自动适应你的偏好设置。
+支持浅色模式、深色模式或跟随系统主题。STKClaw 自动适应你的偏好设置。
 
 ---
 
@@ -130,14 +130,14 @@ HNClaw 直接基于官方 **OpenClaw** 核心构建。无需单独安装，我�
 
 #### 预构建版本（推荐）
 
-从 [Releases](https://github.com/ValueCell-ai/HNClaw/releases) 页面下载适用于你平台的最新版本。
+从 [Releases](https://github.com/ValueCell-ai/STKClaw/releases) 页面下载适用于你平台的最新版本。
 
 #### 从源码构建
 
 ```bash
 # 克隆仓库
-git clone https://github.com/ValueCell-ai/HNClaw.git
-cd HNClaw
+git clone https://github.com/ValueCell-ai/STKClaw.git
+cd STKClaw
 
 # 初始化项目
 pnpm run init
@@ -148,7 +148,7 @@ pnpm dev
 
 ### 首次启动
 
-首次启动 HNClaw 时，**设置向导** 将引导你完成以下步骤：
+首次启动 STKClaw 时，**设置向导** 将引导你完成以下步骤：
 
 1. **语言与区域** – 配置你的首选语言和地区
 2. **AI 供应商** – 输入所支持供应商的 API 密钥
@@ -157,7 +157,7 @@ pnpm dev
 
 ### 代理设置
 
-HNClaw 内置了代理设置，适用于需要通过本地代理客户端访问外网的场景，包括 Electron 本身、OpenClaw Gateway，以及 Telegram 这类频道的联网请求。
+STKClaw 内置了代理设置，适用于需要通过本地代理客户端访问外网的场景，包括 Electron 本身、OpenClaw Gateway，以及 Telegram 这类频道的联网请求。
 
 打开 **设置 → 网关 → 代理**，配置以下内容：
 
@@ -179,17 +179,17 @@ HNClaw 内置了代理设置，适用于需要通过本地代理客户端访问�
 - 只填写 `host:port` 时，会按 HTTP 代理处理。
 - 高级代理项留空时，会自动回退到“代理服务器”。
 - 保存代理设置后，Electron 网络层会立即重新应用代理，并自动重启 Gateway。
-- 如果启用了 Telegram，HNClaw 还会把代理同步到 OpenClaw 的 Telegram 频道配置中。
+- 如果启用了 Telegram，STKClaw 还会把代理同步到 OpenClaw 的 Telegram 频道配置中。
 
 ---
 
 ## 系统架构
 
-HNClaw 采用 **双进程架构**，将 UI 层与 AI 运行时操作分离：
+STKClaw 采用 **双进程架构**，将 UI 层与 AI 运行时操作分离：
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        HNClaw 桌面应用                             │
+│                        STKClaw 桌面应用                             │
 │                                                                  │
 │  ┌────────────────────────────────────────────────────────────┐  │
 │  │              Electron 主进程                                 │  │
@@ -257,7 +257,7 @@ HNClaw 采用 **双进程架构**，将 UI 层与 AI 运行时操作分离：
 ### 项目结构
 
 ```
-HNClaw/
+STKClaw/
 ├── electron/              # Electron 主进程
 │   ├── main/             # 应用入口、窗口管理
 │   ├── gateway/          # OpenClaw 网关进程管理
@@ -327,7 +327,7 @@ pnpm package:linux        # 为 Linux 打包
 
 ## 参与贡献
 
-我们欢迎社区的各种贡献！无论是修复 Bug、开发新功能、改进文档还是翻译——每一份贡献都让 HNClaw 变得更好。
+我们欢迎社区的各种贡献！无论是修复 Bug、开发新功能、改进文档还是翻译——每一份贡献都让 STKClaw 变得更好。
 
 ### 如何贡献
 
@@ -348,7 +348,7 @@ pnpm package:linux        # 为 Linux 打包
 
 ## 致谢
 
-HNClaw 构建于以下优秀的开源项目之上：
+STKClaw 构建于以下优秀的开源项目之上：
 
 - [OpenClaw](https://github.com/OpenClaw) – AI 智能体运行时
 - [Electron](https://www.electronjs.org/) – 跨平台桌面框架
@@ -371,14 +371,14 @@ HNClaw 构建于以下优秀的开源项目之上：
 ## Stars 历史
 
 <p align="center">
-  <img src="https://api.star-history.com/svg?repos=ValueCell-ai/HNClaw&type=Date" alt="Stars 历史图表" />
+  <img src="https://api.star-history.com/svg?repos=ValueCell-ai/STKClaw&type=Date" alt="Stars 历史图表" />
 </p>
 
 ---
 
 ## 许可证
 
-HNClaw 基于 [MIT 许可证](LICENSE) 发布。你可以自由地使用、修改和分发本软件。
+STKClaw 基于 [MIT 许可证](LICENSE) 发布。你可以自由地使用、修改和分发本软件。
 
 ---
 

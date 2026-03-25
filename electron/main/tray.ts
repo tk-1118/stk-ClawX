@@ -57,7 +57,7 @@ export function createTray(mainWindow: BrowserWindow): Tray {
   tray = new Tray(icon);
   
   // Set tooltip
-  tray.setToolTip('HNClaw - AI Assistant');
+  tray.setToolTip('STKClaw - AI Assistant');
   
   const showWindow = () => {
     if (mainWindow.isDestroyed()) return;
@@ -68,7 +68,7 @@ export function createTray(mainWindow: BrowserWindow): Tray {
   // Create context menu
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Show HNClaw',
+      label: 'Show STKClaw',
       click: showWindow,
     },
     {
@@ -130,7 +130,7 @@ export function createTray(mainWindow: BrowserWindow): Tray {
       type: 'separator',
     },
     {
-      label: 'Quit HNClaw',
+      label: 'Quit STKClaw',
       click: () => {
         app.quit();
       },
@@ -165,7 +165,7 @@ export function createTray(mainWindow: BrowserWindow): Tray {
  */
 export function updateTrayStatus(status: string): void {
   if (tray) {
-    tray.setToolTip(`HNClaw - ${status}`);
+    tray.setToolTip(`STKClaw - ${status}`);
   }
 }
 

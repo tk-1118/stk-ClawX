@@ -1,8 +1,8 @@
-## HNClaw Tool Notes
+## STKClaw Tool Notes
 
 ### uv (Python)
 
-- `uv` is bundled with HNClaw and on PATH. Do NOT use bare `python` or `pip`.
+- `uv` is bundled with STKClaw and on PATH. Do NOT use bare `python` or `pip`.
 - Run scripts: `uv run python <script>` | Install packages: `uv pip install <package>`
 
 ### Browser

@@ -338,7 +338,7 @@ function registerCronHandlers(gatewayManager: GatewayManager): void {
   });
 
   // Create a new cron job
-  // UI-created tasks have no delivery target — results go to the HNClaw chat page.
+  // UI-created tasks have no delivery target — results go to the STKClaw chat page.
   // Tasks created via external channels (Feishu, Discord, etc.) are handled
   // directly by the OpenClaw Gateway and do not pass through this IPC handler.
   ipcMain.handle('cron:create', async (_, input: {
@@ -355,7 +355,7 @@ function registerCronHandlers(gatewayManager: GatewayManager): void {
         enabled: input.enabled ?? true,
         wakeMode: 'next-heartbeat',
         sessionTarget: 'isolated',
-        // UI-created jobs deliver results via HNClaw WebSocket chat events,
+        // UI-created jobs deliver results via STKClaw WebSocket chat events,
         // not external messaging channels.  Setting mode='none' prevents
         // the Gateway from attempting channel delivery (which would fail
         // with "Channel is required" when no channels are configured).

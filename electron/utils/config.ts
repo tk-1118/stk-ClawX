@@ -7,10 +7,10 @@
  * Port configuration
  */
 export const PORTS = {
-  /** HNClaw GUI development server port */
+  /** STKClaw GUI development server port */
   CLAWX_DEV: 5173,
   
-  /** HNClaw GUI production port (for reference) */
+  /** STKClaw GUI production port (for reference) */
   CLAWX_GUI: 23333,
   
   /** OpenClaw Gateway port */
@@ -33,11 +33,11 @@ export const APP_PATHS = {
   /** OpenClaw configuration directory */
   OPENCLAW_CONFIG: '~/.openclaw',
   
-  /** HNClaw configuration directory */
-  CLAWX_CONFIG: '~/.HNClaw',
+  /** STKClaw configuration directory */
+  CLAWX_CONFIG: '~/.STKClaw',
   
   /** Log files directory */
-  LOGS: '~/.HNClaw/logs',
+  LOGS: '~/.STKClaw/logs',
 } as const;
 
 /**

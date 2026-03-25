@@ -1,6 +1,6 @@
-appId: app.HNClaw.desktop
-productName: HNClaw
-copyright: Copyright © 2026 HNClaw
+appId: app.STKClaw.desktop
+productName: STKClaw
+copyright: Copyright © 2026 STKClaw
 compression: maximum
 artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 
@@ -52,7 +52,7 @@ publish:
     useMultipleRangeRequest: false
   - provider: github
     owner: ValueCell-ai
-    repo: HNClaw
+    repo: STKClaw
 
 # macOS Configuration
 mac:
@@ -79,8 +79,8 @@ mac:
   entitlementsInherit: entitlements.mac.plist
   notarize: true
   extendInfo:
-    NSMicrophoneUsageDescription: HNClaw requires microphone access for voice features
-    NSCameraUsageDescription: HNClaw requires camera access for video features
+    NSMicrophoneUsageDescription: STKClaw requires microphone access for voice features
+    NSCameraUsageDescription: STKClaw requires camera access for video features
 
 dmg:
   background: resources/dmg-background.png
@@ -126,8 +126,8 @@ nsis:
   differentialPackage: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: HNClaw
-  uninstallDisplayName: HNClaw
+  shortcutName: STKClaw
+  uninstallDisplayName: STKClaw
   license: LICENSE
   include: scripts/installer.nsh
   installerIcon: resources/icons/icon.ico
@@ -154,16 +154,16 @@ linux:
       arch:
         - x64
   category: Utility
-  maintainer: HNClaw Team <public@valuecell.ai>
-  vendor: HNClaw
+  maintainer: STKClaw Team <public@valuecell.ai>
+  vendor: STKClaw
   synopsis: AI Assistant powered by OpenClaw
   description: |
-    HNClaw is a graphical AI assistant application that integrates with
+    STKClaw is a graphical AI assistant application that integrates with
     OpenClaw Gateway to provide intelligent automation and assistance
     across multiple messaging platforms.
   desktop:
     entry:
-      Name: HNClaw
+      Name: STKClaw
       Comment: AI Assistant powered by OpenClaw
       Categories: Utility;Network;
       Keywords: ai;assistant;automation;chat;

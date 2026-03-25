@@ -133,7 +133,7 @@ export function Sidebar() {
       >
         <img src={logoSvg} alt="" className="h-6 w-6 shrink-0 object-contain" />
         {!sidebarCollapsed && (
-          <span className="truncate text-base font-semibold text-foreground">HNClaw</span>
+          <span className="truncate text-base font-semibold text-foreground">STKClaw</span>
         )}
       </div>
       {/* Navigation */}
