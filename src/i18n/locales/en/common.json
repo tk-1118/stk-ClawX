@@ -46,7 +46,7 @@
     },
     "gateway": {
         "notRunning": "Gateway Not Running",
-        "notRunningDesc": "The OpenClaw Gateway needs to be running to use this feature. It will start automatically, or you can start it from Settings.",
+        "notRunningDesc": "The HNClaw Gateway needs to be running to use this feature. It will start automatically, or you can start it from Settings.",
         "warning": "Gateway is not running."
     }
 }

@@ -112,7 +112,7 @@
             ]
         },
         "dingtalk": {
-            "description": "通过 OpenClaw 渠道插件连接钉钉（Stream 模式）",
+            "description": "通过 HNClaw 渠道插件连接钉钉（Stream 模式）",
             "docsUrl": "https://github.com/soimy/openclaw-channel-dingtalk",
             "fields": {
                 "clientId": {
@@ -137,7 +137,7 @@
                 }
             },
             "instructions": [
-                "先在 OpenClaw 安装并启用 dingtalk 插件",
+                "先在 HNClaw 安装并启用 dingtalk 插件",
                 "在钉钉开发者后台创建企业内部应用并开启 Stream 模式",
                 "填写 Client ID 和 Client Secret（必填）",
                 "根据你的应用配置按需填写 Robot Code / Corp ID / Agent ID"
@@ -176,7 +176,7 @@
                 "创建一个新应用",
                 "获取 App ID 和 App Secret",
                 "配置事件订阅",
-                "注意：当前OpenClaw文档中未提及，但请务必在权限管理中添加 contact:contact.base:readonly **应用权限**，否则无法正常使用"
+                "注意：当前HNClaw文档中未提及，但请务必在权限管理中添加 contact:contact.base:readonly **应用权限**，否则无法正常使用"
             ]
         },
         "imessage": {

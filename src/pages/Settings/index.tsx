@@ -556,7 +556,7 @@ export function Settings() {
       </Card> */}
 
       {/* Advanced */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>{t('advanced.title')}</CardTitle>
           <CardDescription>{t('advanced.description')}</CardDescription>
@@ -575,7 +575,7 @@ export function Settings() {
             />
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Developer */}
       {devModeUnlocked && (

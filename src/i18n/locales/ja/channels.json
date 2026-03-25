@@ -109,7 +109,7 @@
             ]
         },
         "dingtalk": {
-            "description": "OpenClaw のチャンネルプラグイン経由で DingTalk に接続します（Stream モード）",
+            "description": "HNClaw のチャンネルプラグイン経由で DingTalk に接続します（Stream モード）",
             "docsUrl": "https://github.com/soimy/openclaw-channel-dingtalk",
             "fields": {
                 "clientId": {
@@ -134,7 +134,7 @@
                 }
             },
             "instructions": [
-                "まず OpenClaw に dingtalk プラグインをインストールして有効化します",
+                "まず HNClaw に dingtalk プラグインをインストールして有効化します",
                 "DingTalk 開発者コンソールで社内アプリを作成し Stream モードを有効にします",
                 "Client ID と Client Secret を入力します（必須）",
                 "必要に応じて Robot Code / Corp ID / Agent ID を入力します"
